@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """ 抓包核心 """
-import os
 import shutil
 from tempfile import NamedTemporaryFile
 from threading import Event, Thread
@@ -138,6 +137,12 @@ class Core():
         :parma packet: 需要处理分类的包
         """
         try:
+            import re
+            match_str = hexdump(packet, dump=True)
+            res = re.search("(21.0a).([0-9A-Za-z].{4}).([0-9A-Za-z].{4})", match_str)
+            if res:
+                match_list = res.group(3).split()
+                print(f"送丝速度为: {int(match_list[0] + match_list[1], 16) / 100}m/min")
             # 如果暂停，则不对列表进行更新操作
             if not self.pause_flag and packet.name == "Ethernet":
                 protocol = None

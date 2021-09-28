@@ -50,9 +50,10 @@ class Ui_MainWindow(QMainWindow):
 
         # 初始主窗口字体
         font = QFont()
-        with open('data.json', 'r') as file_obj:
-            '''读取json文件'''
-            old_font = json.load(file_obj)  # 返回列表数据，也支持字典
+        # with open('./data.json', 'r') as file_obj:
+        #     '''读取json文件'''
+        #     old_font = json.load(file_obj)  # 返回列表数据，也支持字典
+        old_font={"imageUrl": "", "size": 11, "font": "Lucida Sans Typewriter"}
         if old_font["font"]:
             font.setFamily(old_font["font"])
             font.setPointSize(int(old_font["size"]))
@@ -64,7 +65,7 @@ class Ui_MainWindow(QMainWindow):
                 font.setFamily("Noto Mono")
                 old_font["font"] = "Noto Mono"
             font.setPointSize(11)
-            with open('data.json', 'w') as file_obj:
+            with open('./data.json', 'w') as file_obj:
                 '''写入json文件'''
                 json.dump(old_font, file_obj)
 
@@ -509,12 +510,12 @@ class Ui_MainWindow(QMainWindow):
     def on_font_set_clicked(self):
         font, ok = QFontDialog.getFont()
         if ok:
-            with open('data.json', 'r') as file_obj:
+            with open('./data.json', 'r') as file_obj:
                 '''读取json文件'''
                 old_font = json.load(file_obj)  # 返回列表数据，也支持字典
             old_font["font"] = font.family()
             old_font["size"] = font.pointSize()
-            with open('data.json', 'w') as file:
+            with open('./data.json', 'w') as file:
                 json.dump(old_font, file)
             self.info_tree.setFont(font)
             self.treeWidget.setFont(font)
@@ -527,11 +528,11 @@ class Ui_MainWindow(QMainWindow):
     def on_change_border_clicked(self):
         imgName, imgType = QFileDialog.getOpenFileName(
             self, "打开图片", "C:/", "*.jpg;;*.png;;All Files(*)")
-        with open('data.json', 'r') as file_obj:
+        with open('./data.json', 'r') as file_obj:
             '''读取json文件'''
             old_image = json.load(file_obj)  # 返回列表数据，也支持字典
         old_image["imageUrl"] = imgName
-        with open('data.json', 'w') as file:
+        with open('./data.json', 'w') as file:
             json.dump(old_image, file)
         window_pale = QPalette()
         window_pale.setBrush(self.backgroundRole(), QBrush(QPixmap(imgName)))
@@ -797,7 +798,7 @@ class Ui_MainWindow(QMainWindow):
 
 
 def start():
-    app = QApplication([])
+    app = QApplication(sys.argv)
     ui = Ui_MainWindow()
     ui.setupUi()
-    app.exec()
+    sys.exit(app.exec_())

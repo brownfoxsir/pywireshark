@@ -17,13 +17,8 @@ def get_netcard_name():
     netcard_info = {}
     info = net_if_addrs()
     for k, v in info.items():
-        for item in v:
-            # 除去环路地址
-            if item[0] == 2 and item[1] == '127.0.0.1':
-                break
-            # 创建字典
-            elif item[0] == -1 or item[0] == 17:
-                netcard_info.update({item[1]: k})
+        if v[1][0] == 2:
+            netcard_info.update({v[1][1]: k})
     return netcard_info
 
 
@@ -42,17 +37,14 @@ def get_nic_list():
         wmi_obj = wmi.WMI()
         data = {}
         for nic in wmi_obj.Win32_NetworkAdapterConfiguration():
-            if nic.MACAddress is not None:
-                # 与前面的字典匹配
-                mac_address = str(nic.MACAddress).replace(':', '-')
-                if mac_address in netcard_name.keys():
-                    net_card_name = netcard_name.get(mac_address)
-                    nic_name = str(nic.Caption)[11:]
-                    data.update({net_card_name: nic_name})
-        return (system_name, data)
+            if nic.IPAddress is not None:
+                for i in netcard_name.keys():
+                    if i in nic.IPAddress:
+                        data.update({netcard_name.get(i):nic.Description})
+        return system_name, data
     elif system_name == "Linux":
         List = list(netcard_name.values())
-        return (system_name, List)
+        return system_name, List
     else:
         return None
 
